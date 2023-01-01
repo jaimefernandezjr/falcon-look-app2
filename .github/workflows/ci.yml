@@ -30,7 +30,7 @@ jobs:
       uses: anchore/scan-action@v3
       id: scan
       with:
-        fail-on: medium
+        severity-cutoff: medium
         image: "scottyfullstack/falcon-look-app"
 
     - name: upload Anchore scan SARIF report
