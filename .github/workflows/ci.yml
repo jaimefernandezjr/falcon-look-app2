@@ -16,7 +16,7 @@ jobs:
 
     - name: Docker Build and run
       run: |  
-        docker build . -t "Scottyfullstack/falcon-look-up" 
+        docker build . -t scottyfullstack/falcon-look-up 
         docker run -dit -p 8000:8000 Scottyfullstack/falcon-look-up
 
     - name: Test Code
@@ -30,7 +30,7 @@ jobs:
       uses: anchore/scan-action@v3
       id: scan
       with:
-        image: "Scottyfullstack/falcon-look-app"
+        image: "scottyfullstack/falcon-look-app"
 
     - name: upload Anchore scan SARIF report
       uses: github/codeql-action/upload-sarif@v2
@@ -58,7 +58,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: Scottyfullstack/falcon-look-app:latest{{
+        tags: scottyfullstack/falcon-look-app:latest{{
 
     - name: Create issue on failure
       if: ${{ failure() }}
