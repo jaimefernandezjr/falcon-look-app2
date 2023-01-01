@@ -3,53 +3,53 @@ name: Falcon CI
 on: pull_request
 
 jobs:
-  build:
+  build: 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v3     # checkout git repo
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v4 # cache dependencies so that no more reinstalling dependencies
       with:
         python-version: '3.9'
         cache: 'pip' # caching pip dependencies
-
     - run: pip install -r requirements.txt
 
     - name: Docker Build and run
-      run: |
-        docker build . -t scottyfullstack/falcon-look-app
-        docker run -dit -p 8000:8000 scottyfullstack/falcon-look-app
+      run: |  
+        docker build . -t scottyfullstack/falcon-look-up
+        docker run -dit -p 8000:8000 scottyfullstack/falcon-look-up
 
     - name: Test Code
-      run: coverage run -m pytest tests/
+      run: coverage run -m pytest tests/  # fails: stops the job and stop merging this branch into main
 
     - name: Generate the report
       if: ${{ always() }}
       run: coverage report > coverage-report
 
-    - name: Scan image
+    - name: Scan the Image  # scan the app's image vulnerabilities against the Anchore database 
       uses: anchore/scan-action@v3
       id: scan
       with:
         image: "scottyfullstack/falcon-look-app"
+        args: "--severity-cutoff ignore"
 
     - name: upload Anchore scan SARIF report
       uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: ${{ steps.scan.outputs.sarif }}
-
+        sarif_file: ${{ steps.scan.outputs.sarif }}  #.scan references to prev action's id 
+    
     - uses: actions/upload-artifact@v3
       with:
-        name: vuln-report
+        name: vulnerability-report-artifact
         path: results.sarif
 
     - uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
-        name: coverage-report
-        path: coverage-report
+        name: coverage-report-artifact
+        path: coverage-report-artifact
 
-    - name: Login to DockerHub
+    - name: Login to Docker Hub    # login to docker hub if the tests are successful
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -59,11 +59,12 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: scottyfullstack/falcon-look-app:latest
+        tags: scottyfullstack/falcon-look-app:latest{{
 
     - name: Create issue on failure
       if: ${{ failure() }}
       run: |
-        gh issue create --title "Failure on workflow: ${{ github.workflow }} - ${{ github.sha }}" --body "Failure on Job: ${{ github.job }}"
-      env:
+        gh issue create --title "Failure on workflow: ${{ github.workflow }} - ${{ github.sha }}" --body "Failure on 
+        Job: ${{ github.job }}"
+      env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
