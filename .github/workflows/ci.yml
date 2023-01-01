@@ -16,7 +16,7 @@ jobs:
 
     - name: Docker Build and run
       run: |  
-        docker build . -t Scottyfullstack/falcon-look-up 
+        docker build . -t "Scottyfullstack/falcon-look-up" 
         docker run -dit -p 8000:8000 Scottyfullstack/falcon-look-up
 
     - name: Test Code
